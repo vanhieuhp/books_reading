@@ -1,0 +1,196 @@
+================================================================================
+  CHAPTER 6, SECTION 1: PARTITIONING OF KEY-VALUE DATA
+  Complete Learning Module for DDIA
+================================================================================
+
+Welcome! You now have a complete, hands-on learning module for Chapter 6,
+Section 1 of "Designing Data-Intensive Applications" by Martin Kleppmann.
+
+================================================================================
+  QUICK START (Choose One)
+================================================================================
+
+Option 1: Run All Exercises (2 hours)
+  python3 01_key_range_partitioning.py
+  python3 02_hash_partitioning.py
+  python3 03_compound_keys.py
+  python3 04_hot_spot_solutions.py
+
+Option 2: Quick Overview (15 minutes)
+  1. Read: QUICKSTART.md
+  2. Run:  python3 01_key_range_partitioning.py
+
+Option 3: Deep Dive (3 hours)
+  1. Read: README.md
+  2. Run all 4 exercises
+  3. Read: TEACHING_GUIDE.md
+  4. Modify code and experiment
+
+================================================================================
+  FILES IN THIS DIRECTORY
+================================================================================
+
+EXERCISES (Python code - run with python3):
+  01_key_range_partitioning.py  — Range-based key assignment
+  02_hash_partitioning.py       — Hash-based key distribution
+  03_compound_keys.py           — Hybrid approach (Cassandra-style)
+  04_hot_spot_solutions.py      — Handling skewed workloads
+
+DOCUMENTATION (Read in this order):
+  00_START_HERE.txt             — This file
+  QUICKSTART.md                 — 5-minute quick start
+  README.md                     — Complete guide with comparisons
+  TEACHING_GUIDE.md             — Teaching notes and insights
+  INDEX.md                      — File overview and statistics
+
+================================================================================
+  WHAT YOU'LL LEARN
+================================================================================
+
+Exercise 1: Key Range Partitioning (30 min)
+  ✅ How keys are assigned to partitions based on ranges
+  ✅ Why range queries are efficient
+  ✅ The hot spot problem with time-series data
+  ✅ How to fix hot spots by prefixing keys
+
+Exercise 2: Hash Partitioning (30 min)
+  ✅ How hash functions distribute keys uniformly
+  ✅ Why hash partitioning eliminates hot spots
+  ✅ Why range queries become slow
+  ✅ Why deterministic hash functions are required
+
+Exercise 3: Compound Primary Keys (30 min)
+  ✅ How to combine hashing and sorting
+  ✅ Efficient range queries within a partition
+  ✅ Real-world use cases (social media, IoT, time-series)
+  ✅ Trade-offs with cross-partition queries
+
+Exercise 4: Hot Spot Solutions (30 min)
+  ✅ How to detect hot keys
+  ✅ Key splitting as a solution
+  ✅ Read/write trade-offs
+  ✅ When to apply splitting
+
+================================================================================
+  THE BIG PICTURE
+================================================================================
+
+Range Partitioning:
+  ✅ Fast range queries
+  ❌ Hot spots (all writes for "now" go to 1 partition)
+
+Hash Partitioning:
+  ✅ No hot spots (even distribution)
+  ❌ Slow range queries (must query all partitions)
+
+Compound Keys (BEST OF BOTH):
+  ✅ No hot spots + fast range queries (within partition)
+  ❌ Slow cross-partition range queries
+
+Hot Spot Splitting:
+  ✅ Spreads load across partitions
+  ❌ Reads must query all split keys
+
+================================================================================
+  REAL-WORLD SYSTEMS
+================================================================================
+
+HBase:
+  • Range-based partitioning
+  • Automatic region splitting
+  • Used by: Facebook, Twitter, Yahoo
+
+Cassandra:
+  • Compound keys: PRIMARY KEY (partition_key, clustering_key)
+  • partition_key is hashed, clustering_key is sorted
+  • Used by: Netflix, Apple, Instagram
+
+DynamoDB:
+  • Hash-based partitioning
+  • Global Secondary Indexes
+  • Auto-scaling for hot partitions
+  • Used by: Amazon, Lyft, Airbnb
+
+MongoDB:
+  • Range-based (before v2.4)
+  • Hash-based (after v2.4)
+  • Compound shard keys supported
+  • Used by: eBay, Uber, Foursquare
+
+================================================================================
+  GETTING STARTED
+================================================================================
+
+Step 1: Read QUICKSTART.md (5 minutes)
+  This gives you the big picture and key insights.
+
+Step 2: Run Exercise 1 (5 minutes)
+  python3 01_key_range_partitioning.py
+  
+  This shows you how range partitioning works and the hot spot problem.
+
+Step 3: Run Exercises 2-4 (15 minutes each)
+  python3 02_hash_partitioning.py
+  python3 03_compound_keys.py
+  python3 04_hot_spot_solutions.py
+
+Step 4: Read README.md (10 minutes)
+  This has detailed explanations and a comparison table.
+
+Step 5: Experiment (30 minutes)
+  Modify the code and re-run to see what happens!
+
+================================================================================
+  KEY INSIGHTS FROM DDIA
+================================================================================
+
+On Range Partitioning:
+  "Assign a continuous range of keys to each partition, similar to how
+   volumes of a printed encyclopedia cover letters A–Ce, Ce–G, G–K."
+
+On Hash Partitioning:
+  "A good hash function takes skewed, clustered data and distributes it
+   uniformly across an output range."
+
+On Compound Keys:
+  "Cassandra uses a brilliant compromise between key range and hash
+   partitioning. The first column is hashed to determine the partition.
+   The remaining columns are used as a sorted index within that partition."
+
+On Hot Spots:
+  "Today, most data systems are not able to automatically compensate for
+   such a highly skewed workload, so it's the responsibility of the
+   application to reduce the skew."
+
+================================================================================
+  NEXT STEPS
+================================================================================
+
+After completing this module:
+  1. ✅ You understand how keys are assigned to partitions
+  2. ✅ You know the trade-offs between range and hash partitioning
+  3. ✅ You understand why compound keys are powerful
+  4. ✅ Ready for Section 2: Partitioning and Secondary Indexes
+
+================================================================================
+  QUESTIONS?
+================================================================================
+
+1. Check QUICKSTART.md for common questions
+2. Read the inline comments in the code
+3. Review TEACHING_GUIDE.md for detailed explanations
+4. Modify the code and experiment!
+
+================================================================================
+  READY TO START?
+================================================================================
+
+Run this command:
+  python3 01_key_range_partitioning.py
+
+Then read:
+  QUICKSTART.md
+
+Enjoy! 🚀
+
+================================================================================

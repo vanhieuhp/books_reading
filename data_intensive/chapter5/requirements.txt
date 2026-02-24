@@ -1,0 +1,8 @@
+# Chapter 5: Replication - Dependencies
+
+# No external dependencies required!
+# All exercises use Python standard library only.
+# This makes it easy to run without installing anything.
+
+# Optional: colored output (nice to have, not required)
+# colorama>=0.4.6

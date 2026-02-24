@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc:*)",
+      "Bash(python:*)",
+      "Bash(c:/Users/hieunv/Workspaces/Myself/Projects/data_intensive/chapter8/3_unreliable_clocks/INDEX.md:*)",
+      "Bash(\"c:\\\\Users\\\\hieunv\\\\Workspaces\\\\Myself\\\\Projects\\\\data_intensive\\\\chapter8\\\\SUMMARY.md\":*)",
+      "Bash(grep:*)",
+      "Bash(c:/Users/hieunv/Workspaces/Myself/Projects/data_intensive/chapter9/5_membership_and_coordination_services/00_START_HERE.md:*)"
+    ]
+  }
+}

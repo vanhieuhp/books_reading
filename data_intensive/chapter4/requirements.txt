@@ -1,0 +1,33 @@
+# Chapter 4: Encoding and Evolution - Dependencies
+
+# Core encoding libraries
+protobuf>=4.21.0          # Protocol Buffers
+avro-python3>=1.11.0      # Apache Avro
+msgpack>=1.0.0            # MessagePack (binary JSON)
+
+# Web frameworks (for REST APIs and services)
+flask>=2.3.0              # Lightweight web framework
+fastapi>=0.100.0          # Modern async web framework (alternative to Flask)
+uvicorn>=0.23.0           # ASGI server for FastAPI
+
+# gRPC
+grpcio>=1.56.0            # gRPC Python implementation
+grpcio-tools>=1.56.0      # Protocol buffer compiler plugins for gRPC
+
+# Database libraries
+sqlalchemy>=2.0.0         # SQL toolkit (for SQL database examples)
+pymongo>=4.5.0            # MongoDB driver (for document database examples)
+
+# Message queue (optional)
+kafka-python>=2.0.2       # Kafka client library
+confluent-kafka>=2.3.0    # Confluent's Kafka client (alternative)
+
+# Schema validation
+jsonschema>=4.19.0        # JSON Schema validation
+
+# Utilities
+python-dotenv>=1.0.0      # Environment variable management
+
+# Testing (optional but recommended)
+pytest>=7.4.0             # Testing framework
+pytest-asyncio>=0.21.0    # Async testing support

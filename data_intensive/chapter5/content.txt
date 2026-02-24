@@ -1,0 +1,35 @@
+1. Single-Leader Replication (Master/Slave)
+This is the most common configuration (used by MySQL, PostgreSQL, MongoDB).
+
+The Workflow: One node is the leader. All "writes" must go to the leader. The leader sends those changes to followers (replicas) via a replication log or change stream.
+
+The Catch: If the leader dies, you need failover—choosing a new leader. This is notoriously tricky; if two nodes both think they are the leader, you get "split-brain," which leads to data corruption.
+
+2. Multi-Leader Replication
+Common for systems spread across multiple data centers or apps that need to work offline (like a calendar app on your phone that syncs later).
+
+The Workflow: You have multiple leaders, usually one per data center. Each leader accepts writes and forwards them to other leaders.
+
+The Big Problem: Conflict Resolution. If two people edit the same data at the same time on different leaders, how do you decide who wins?
+
+Solutions: Last Write Wins (LWW), merging changes, or writing custom conflict resolution logic.
+
+3. Leaderless Replication (Dynamo-style)Used by Cassandra and Riak. There is no leader; the client sends writes to several nodes in parallel.Quorums ($w + r > n$): To ensure a read sees the latest write, you use a quorum. If you write to $w$ nodes and read from $r$ nodes out of a total $n$, and $w + r > n$, you are mathematically guaranteed to overlap with at least one node that has the latest data.Self-Healing: Uses "Read Repair" (fixing stale data when a client detects it) and "Anti-Entropy" (background processes that sync data).	
+
+The "Lag" Problem: Consistency Guarantees
+Most replication is asynchronous for performance. This leads to replication lag, which creates three specific user-facing problems that Kleppmann emphasizes you must solve:
+
+Reading Your Own Writes: You update your profile, refresh the page, and the old data is still there because you hit a lagging follower.
+
+Fix: Always read the user's own profile from the leader.
+
+Monotonic Reads: A user sees a comment, refreshes, and it disappears (then reappears later). It feels like "moving backward in time."
+
+Fix: Ensure a user always reads from the same replica (e.g., hashing their User ID).
+
+Consistent Prefix Reads: If someone asks a question and someone else answers, a third observer might see the answer before the question due to partition lag.
+
+Fix: Ensure causally related writes are written to the same partition.
+
+Reviewer's Tip for Chapter 5
+Pay close attention to the Replication Logs section. Whether it's Statement-based, Write-ahead log (WAL), or Logical (row-based) replication, understanding how the data actually moves between wires is key to debugging performance bottlenecks.

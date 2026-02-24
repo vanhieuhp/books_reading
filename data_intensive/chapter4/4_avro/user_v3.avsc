@@ -1,0 +1,45 @@
+{
+  "type": "record",
+  "name": "User",
+  "namespace": "com.example",
+  "fields": [
+    {
+      "name": "id",
+      "type": "int"
+    },
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "email",
+      "type": ["null", "string"],
+      "default": null
+    },
+    {
+      "name": "phone_number",
+      "type": ["null", "string"],
+      "default": null,
+      "aliases": ["phone"]
+    },
+    {
+      "name": "metadata",
+      "type": ["null", {
+        "type": "record",
+        "name": "UserMetadata",
+        "fields": [
+          {
+            "name": "created_at",
+            "type": "string"
+          },
+          {
+            "name": "last_login",
+            "type": ["null", "string"],
+            "default": null
+          }
+        ]
+      }],
+      "default": null
+    }
+  ]
+}

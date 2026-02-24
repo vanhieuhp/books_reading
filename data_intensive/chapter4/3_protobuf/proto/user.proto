@@ -1,0 +1,65 @@
+// Protocol Buffers schema definition for User
+// This demonstrates schema evolution and compatibility
+
+syntax = "proto3";
+
+// User message - represents a user in the system
+// Field numbers (1, 2, 3, etc.) are critical - NEVER change them!
+// They enable backward and forward compatibility
+message User {
+  // Field number 1: User ID (required)
+  int32 id = 1;
+  
+  // Field number 2: User name (required)
+  string name = 2;
+  
+  // Field number 3: Email (optional - added in v2)
+  // In proto3, all fields are optional by default
+  string email = 3;
+  
+  // Field number 4: Age (optional)
+  int32 age = 4;
+  
+  // Field number 5: Active status
+  bool active = 5;
+  
+  // Field number 6: Tags (repeated = array/list)
+  repeated string tags = 6;
+  
+  // Field number 7: Metadata (nested message)
+  UserMetadata metadata = 7;
+}
+
+// Nested message for user metadata
+message UserMetadata {
+  string created_at = 1;
+  string last_login = 2;
+  map<string, string> settings = 3;  // Map type (key-value pairs)
+}
+
+// Service definition (for gRPC - we'll use this later)
+service UserService {
+  rpc GetUser (GetUserRequest) returns (User);
+  rpc CreateUser (CreateUserRequest) returns (User);
+  rpc ListUsers (ListUsersRequest) returns (ListUsersResponse);
+}
+
+message GetUserRequest {
+  int32 id = 1;
+}
+
+message CreateUserRequest {
+  string name = 1;
+  string email = 2;
+  int32 age = 3;
+}
+
+message ListUsersRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message ListUsersResponse {
+  repeated User users = 1;
+  int32 total = 2;
+}

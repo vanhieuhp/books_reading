@@ -1,0 +1,32 @@
+// Protocol Buffers schema - Version 2
+// This demonstrates schema evolution: adding and removing fields
+
+syntax = "proto3";
+
+// User message - evolved version
+// Notice: We ADDED fields but kept the same field numbers for existing fields
+message User {
+  // Existing fields (same numbers - this is critical!)
+  int32 id = 1;
+  string name = 2;
+  string email = 3;
+  
+  // REMOVED: age field (field number 4) - old code will ignore it
+  // bool active = 5;  // Also removed
+  
+  // NEW fields (new field numbers)
+  string phone = 8;        // New field, new number
+  string address = 9;      // New field, new number
+  
+  // Kept existing fields
+  repeated string tags = 6;
+  UserMetadata metadata = 7;
+}
+
+// Enhanced metadata
+message UserMetadata {
+  string created_at = 1;
+  string last_login = 2;
+  map<string, string> settings = 3;
+  string timezone = 4;  // New field
+}
