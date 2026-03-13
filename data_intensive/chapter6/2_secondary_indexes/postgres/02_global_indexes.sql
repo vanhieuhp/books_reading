@@ -346,9 +346,9 @@ ALTER TABLE products ENABLE TRIGGER products_brand_sync;
 
 -- The product now appears in the index (after the "flush")
 
-================================================================================
-STEP 10: COMPARE READ PERFORMANCE
-================================================================================
+-- ================================================================================
+-- STEP 10: COMPARE READ PERFORMANCE
+-- ================================================================================
 
 -- Scenario 1: Query by PRIMARY KEY (fastest - single partition)
 EXPLAIN ANALYZE
@@ -369,9 +369,9 @@ WHERE idx.color = 'red';
 -- - Scenario 2: All 4 partitions scanned (scatter/gather)
 -- - Scenario 3: Single index partition scanned (fast!)
 
-================================================================================
-STEP 11: PRACTICAL QUERIES USING GLOBAL INDEXES
-================================================================================
+-- ================================================================================
+-- STEP 11: PRACTICAL QUERIES USING GLOBAL INDEXES
+-- ================================================================================
 
 -- Find all red products with price > 30000
 SELECT p.* FROM products p
@@ -379,56 +379,58 @@ INNER JOIN products_by_color idx ON p.product_id = idx.product_id
 WHERE idx.color = 'red' AND p.price > 30000;
 
 -- Find all Toyota products under 25000
+explain analyze
 SELECT p.* FROM products p
 INNER JOIN products_by_brand idx ON p.product_id = idx.product_id
 WHERE idx.brand = 'Toyota' AND p.price < 25000;
 
 -- Find products by multiple colors (may need multiple partitions)
+explain analyze
 SELECT p.* FROM products p
 INNER JOIN products_by_color idx ON p.product_id = idx.product_id
 WHERE idx.color IN ('red', 'blue');
 
-================================================================================
-SUMMARY: GLOBAL INDEXES
-================================================================================
+-- ================================================================================
+-- SUMMARY: GLOBAL INDEXES
+-- ================================================================================
 
-✅ GLOBAL INDEX PROS:
-  - Reads are FAST (single index partition, no scatter/gather)
-  - Efficient for complex queries
-  - No tail latency problem
+-- ✅ GLOBAL INDEX PROS:
+--   - Reads are FAST (single index partition, no scatter/gather)
+--   - Efficient for complex queries
+--   - No tail latency problem
+--
+-- ❌ GLOBAL INDEX CONS:
+--   - Writes are SLOW (must update index on different node)
+--   - Usually eventually consistent (async updates)
+--   - More complex to implement and maintain
 
-❌ GLOBAL INDEX CONS:
-  - Writes are SLOW (must update index on different node)
-  - Usually eventually consistent (async updates)
-  - More complex to implement and maintain
+-- ⚠️  KEY TRADE-OFF:
+--   Write:  Local (fast) vs Global (slow)
+--   Read:   Local (slow) vs Global (fast)
 
-⚠️  KEY TRADE-OFF:
-  Write:  Local (fast) vs Global (slow)
-  Read:   Local (slow) vs Global (fast)
+-- 📌 WHEN TO USE:
+--   - Global indexes: READ-HEAVY workloads (search, e-commerce)
+--   - Local indexes:   WRITE-HEAVY workloads (IoT, logs, events)
+--
+-- ================================================================================
+-- COMPARISON WITH LOCAL INDEXES
+-- ================================================================================
+--
+-- | Aspect            | Local Index        | Global Index       |
+-- |------------------|-------------------|-------------------|
+-- | Write Speed      | Fast (single node)| Slow (cross-node) |
+-- | Read Speed       | Slow (all nodes)  | Fast (one node)   |
+-- | Consistency      | Immediate         | Eventual          |
+-- | Implementation   | Simple            | Complex           |
+-- | Best For         | Write-heavy       | Read-heavy        |
+--
+-- ================================================================================
+-- NEXT STEPS:
+-- ================================================================================
 
-📌 WHEN TO USE:
-  - Global indexes: READ-HEAVY workloads (search, e-commerce)
-  - Local indexes:   WRITE-HEAVY workloads (IoT, logs, events)
-
-================================================================================
-COMPARISON WITH LOCAL INDEXES
-================================================================================
-
-| Aspect            | Local Index        | Global Index       |
-|------------------|-------------------|-------------------|
-| Write Speed      | Fast (single node)| Slow (cross-node) |
-| Read Speed       | Slow (all nodes)  | Fast (one node)   |
-| Consistency      | Immediate         | Eventual          |
-| Implementation   | Simple            | Complex           |
-| Best For         | Write-heavy       | Read-heavy        |
-
-================================================================================
-NEXT STEPS:
-================================================================================
-
-1. Compare with Local Indexes (01_local_indexes.sql)
-2. Run EXPLAIN ANALYZE on both approaches
-3. Read DDIA Chapter 6.2 for more theory
-4. Consider which approach fits your use case
-
-EOF
+-- 1. Compare with Local Indexes (01_local_indexes.sql)
+-- 2. Run EXPLAIN ANALYZE on both approaches
+-- 3. Read DDIA Chapter 6.2 for more theory
+-- 4. Consider which approach fits your use case
+--
+-- EOF

@@ -1,0 +1,204 @@
+---
+name: production-mindset
+description: >
+  Senior/Staff-level production engineering skill for designing, reviewing, and debugging
+  distributed systems with a failure-first mindset. Use this skill whenever the user asks
+  about system design, production incidents, cascading failures, Go concurrency patterns,
+  circuit breakers, timeout budgets, connection pool sizing, goroutine leaks, observability
+  instrumentation, or post-mortem analysis. Also trigger for code reviews involving
+  error handling at service boundaries, graceful degradation design, or blast radius
+  estimation. Especially useful when the user wants to audit existing systems, run
+  production readiness reviews, or analyze real-world failure case studies (Knight Capital,
+  AWS outages, etc.).
+---
+
+# Production Mindset Transformation
+
+A Senior/Staff-level skill for building systems that fail gracefully, degrade predictably,
+and recover automatically. Rooted in failure-first design philosophy.
+
+---
+
+## Core Philosophy
+
+> "Every system will fail. The question is whether you designed the failure."
+
+Four principles underpin everything in this skill:
+
+1. **Failure is a first-class citizen** — Model failure paths before happy paths
+2. **Blast radius over prevention** — You cannot prevent all failures; contain them
+3. **Observability is not optional** — If you can't see it, you can't fix it in production
+4. **Degrade, don't die** — Every dependency must have a fallback answer
+
+---
+
+## Skill Components
+
+### 1. Concept Maps
+Connect philosophy → pattern → implementation. Always present as:
+- The failure mode (what goes wrong)
+- The blast radius (what it affects)
+- The mitigation pattern (circuit breaker, timeout budget, backpressure, etc.)
+- The Go implementation hook
+
+### 2. Live Code Labs (Go, Production-Grade)
+
+All labs use:
+- `context.Context` for cancellation and deadline propagation
+- Structured logging (`log/slog` or `zap`)
+- Prometheus metrics at every boundary
+- Realistic load simulation (not toy examples)
+
+**Lab Sequence:**
+
+#### Lab 1 — Thundering Herd
+```
+Scenario: Cache miss storm on cold start / cache eviction
+Pattern:  singleflight + jitter on retry
+Metrics:  cache_hit_ratio, origin_rps, p99_latency
+```
+Key Go primitives: `golang.org/x/sync/singleflight`, `time.Duration` jitter with `rand`
+
+#### Lab 2 — Connection Pool Exhaustion
+```
+Scenario: Downstream DB saturates under traffic spike
+Pattern:  Pool sizing math + timeout budgets + queue depth metrics
+Metrics:  db_pool_wait_duration, db_pool_size, db_query_errors_total
+```
+Key Go primitives: `database/sql` MaxOpenConns/MaxIdleConns, `context.WithTimeout`
+
+#### Lab 3 — Cascading Timeout Failure
+```
+Scenario: 50ms downstream p99 → 5s upstream collapse
+Pattern:  Context deadline propagation, per-hop timeout budgets
+Metrics:  request_duration_seconds (per service), deadline_exceeded_total
+```
+Key Go primitives: `context.WithDeadline`, deadline remaining check before each hop
+
+#### Lab 4 — Goroutine Leak Detection
+```
+Scenario: Goroutines spawned without cancellation → OOM over hours
+Pattern:  Leak detection via pprof, goroutine lifecycle ownership
+Metrics:  go_goroutines (runtime metric), pprof goroutine profiles
+```
+Key Go primitives: `runtime/pprof`, `goleak` in tests, `context.Done()` select patterns
+
+---
+
+### 3. Production Code Audit Checklist
+
+Use during PR reviews, design reviews, and incident retrospectives.
+
+#### A. Timeout & Deadline Propagation
+- [ ] Every outbound call (HTTP, DB, gRPC, cache) has an explicit timeout
+- [ ] `context.Context` is the first parameter of every function in the call chain
+- [ ] Deadline budget is checked before starting expensive work (`ctx.Err() != nil`)
+- [ ] Per-hop timeouts sum to less than the top-level SLA
+
+#### B. Error Handling at Service Boundaries
+- [ ] Errors are wrapped with context (`fmt.Errorf("calling user-service: %w", err)`)
+- [ ] Retries use exponential backoff with jitter — never bare retry loops
+- [ ] Circuit breaker or bulkhead pattern on every critical downstream
+- [ ] Distinction between retryable and non-retryable errors is explicit
+
+#### C. Resource Lifecycle
+- [ ] Every goroutine has a named owner and a clear exit condition
+- [ ] `defer cancel()` immediately follows every `context.WithCancel/Timeout/Deadline`
+- [ ] DB/HTTP connections are closed via `defer` or explicit lifecycle management
+- [ ] File handles and network connections are audited for leak paths
+
+#### D. Observability Hooks
+- [ ] Request duration histogram at every service boundary (not just ingress)
+- [ ] Error rate counter with error type label
+- [ ] Resource saturation metric (pool size, queue depth, goroutine count)
+- [ ] Runbook link in every alert rule
+
+#### E. Graceful Degradation
+- [ ] Every non-critical dependency has a defined fallback (cache, default, skip)
+- [ ] Degraded mode is tested — not just happy path
+- [ ] Load shedding strategy exists for sustained overload (queue depth limit, priority)
+- [ ] Graceful shutdown drains in-flight requests before exit
+
+---
+
+### 4. Case Study Analysis Framework
+
+For each case study (Knight Capital, AWS outages, etc.), apply:
+
+```
+1. TIMELINE     — What happened, in what order
+2. TRIGGER      — The single event that started the cascade
+3. AMPLIFIER    — What made it worse (missing circuit breaker, retry storm, etc.)
+4. BLAST RADIUS — Actual user/revenue impact
+5. DETECTION    — How long until someone knew (and why that long)
+6. PATTERN      — Which failure mode category (thundering herd, split-brain, etc.)
+7. TRANSFERABLE — What checklist item would have caught this
+```
+
+**Knight Capital (2012):**
+- Trigger: Stale deploy flag activated old trading logic on 8 of 9 servers
+- Amplifier: No kill switch, no automated position limit, no real-time P&L alert
+- Pattern: Partial deploy + missing blast radius containment
+- Transferable: Audit item — "Is partial rollout detectable and reversible within 60s?"
+
+**AWS US-EAST-1 (various):**
+- Common pattern: Control plane overload cascades to data plane
+- Transferable: Audit item — "Does your service degrade if its own config/discovery system is slow?"
+
+---
+
+## Reasoning Templates
+
+### Timeout Budget Calculation
+```
+Top-level SLA:     500ms p99
+  └─ Auth service:  30ms (p99 budget)
+  └─ User service:  80ms (p99 budget)
+  └─ DB query:     100ms (p99 budget)
+  └─ Business logic: 50ms
+  └─ Buffer:       240ms (for GC, scheduling, serialization)
+
+Rule: Each hop's timeout = its p99 budget × 1.5 (safety margin)
+```
+
+### Blast Radius Estimation Template
+```
+Failure at: [component]
+Direct impact: [what calls this component]
+Indirect impact: [what calls the callers]
+User-facing symptoms: [what the user sees]
+Revenue impact: [% of transactions affected × $/transaction]
+Time to detect: [based on current alerting]
+Time to mitigate: [manual vs automated]
+```
+
+---
+
+## Go Patterns Quick Reference
+
+| Problem | Pattern | Key API |
+|---|---|---|
+| Cache stampede | singleflight | `golang.org/x/sync/singleflight` |
+| Downstream overload | Circuit breaker | `github.com/sony/gobreaker` |
+| Retry storms | Backoff + jitter | `github.com/cenkalti/backoff/v4` |
+| Goroutine leak | Context cancellation | `context.WithCancel` + `select` |
+| Partial failure | Bulkhead | Separate worker pools per dependency |
+| Timeout cascade | Deadline budget | `context.WithDeadline` + remaining check |
+| Overload shedding | Token bucket | `golang.org/x/time/rate` |
+
+---
+
+## Output Defaults
+
+When generating code labs:
+- Include Prometheus metric registration and instrumentation
+- Use `log/slog` for structured logging
+- Add a `// FAILURE POINT:` comment at the line where the failure manifests
+- Add a `// MITIGATION:` comment at the fix
+- Include a `TestXxx_UnderLoad` benchmark test
+
+When writing audit feedback:
+- Quote the specific line of code
+- Name the failure mode it enables
+- Give the one-line fix
+- Link to the relevant checklist item

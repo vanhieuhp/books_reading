@@ -1,0 +1,65 @@
+# docker-compose.yaml
+# Target system for chaos engineering experiments
+
+version: '3.8'
+
+services:
+  # Frontend API - depends on backend
+  api-gateway:
+    image: nginx:alpine
+    container_name: api-gateway
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend-service
+    networks:
+      - chaos-net
+    labels:
+      - "chaos.enabled=true"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Backend service - depends on database
+  backend-service:
+    image: redis:alpine
+    container_name: backend-service
+    networks:
+      - chaos-net
+    labels:
+      - "chaos.enabled=true"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # A "slow" dependency
+  slow-service:
+    image: alpine:latest
+    container_name: slow-service
+    command: ["sleep", "infinity"]
+    networks:
+      - chaos-net
+    labels:
+      - "chaos.enabled=true"
+
+  # Monitoring - for chaos experiments
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - chaos-net
+
+networks:
+  chaos-net:
+    driver: bridge
+    name: chaos-network
