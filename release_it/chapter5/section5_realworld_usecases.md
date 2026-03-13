@@ -196,4 +196,4 @@ Cloudflare implemented:
 
 ---
 
-*Next: [Section 6 - Core → Leverage Multipliers](./section6_leverage_multipliers.md)*
+*Next: [Section 6 - Core → Leverage Multipliers](section6_leverage_multipliers.md)*

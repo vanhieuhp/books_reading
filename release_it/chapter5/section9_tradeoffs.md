@@ -272,4 +272,4 @@ The patterns in this chapter help you fail fast when infrastructure fails. But a
 
 ---
 
-*Next: [Section 10 - Chapter Summary](./section10_summary.md)*
+*Next: [Section 10 - Chapter Summary](section10_summary.md)*

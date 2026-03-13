@@ -206,4 +206,4 @@ When you master these concepts and drive them across the organization:
 
 ---
 
-*Next: [Section 7 - Step-by-Step Code Lab](./section7_code_lab.md)*
+*Next: [Section 7 - Step-by-Step Code Lab](section7_code_lab.md)*

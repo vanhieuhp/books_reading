@@ -683,6 +683,6 @@ func (s *SimulatedService) Call() (string, error) {
 
 ---
 
-*Next: [Section 8 - Case Study Deep Dive](./section8_case_study.md)*
+*Next: [Section 8 - Case Study Deep Dive](section8_case_study.md)*
 
 *Lab complete! You've built production-grade retry logic that handles infrastructure variability.*

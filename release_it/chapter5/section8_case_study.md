@@ -172,4 +172,4 @@ This was a **hardware failure** (disk space) that appeared as a **software probl
 
 ---
 
-*Next: [Section 9 - Trade-offs & When NOT to Use](./section9_tradeoffs.md)*
+*Next: [Section 9 - Trade-offs & When NOT to Use](section9_tradeoffs.md)*
