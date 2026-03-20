@@ -1,25 +1,25 @@
-================================================================================
-  PostgreSQL Single vs Multi-Object - DDIA Chapter 7.1
-  Learn by doing: Understanding Transaction Scope
-================================================================================
+-- ================================================================================
+--   PostgreSQL Single vs Multi-Object - DDIA Chapter 7.1
+--   Learn by doing: Understanding Transaction Scope
+-- ================================================================================
+--
+-- COVERS:
+--   - Single-object operations: Atomicity for one row
+--   - Multi-object operations: Atomicity across multiple tables
+--   - When to use each type
+--   - Trade-offs
+--
+-- ================================================================================
+-- STEP 1: CONNECT
+-- ================================================================================
 
-COVERS:
-  - Single-object operations: Atomicity for one row
-  - Multi-object operations: Atomicity across multiple tables
-  - When to use each type
-  - Trade-offs
+--   psql -U postgres -d postgres
+--   CREATE DATABASE single_multi_demo;
+--   \c single_multi_demo
 
-================================================================================
-STEP 1: CONNECT
-================================================================================
-
-  psql -U postgres -d postgres
-  CREATE DATABASE single_multi_demo;
-  \c single_multi_demo
-
-================================================================================
-STEP 2: SINGLE-OBJECT OPERATIONS
-================================================================================
+-- ================================================================================
+-- STEP 2: SINGLE-OBJECT OPERATIONS
+-- ================================================================================
 
 -- Single-object: Atomicity and isolation apply to ONE row
 
@@ -46,9 +46,9 @@ SELECT * FROM documents;
 
 -- KEY: Single-object operations are ALWAYS atomic in PostgreSQL
 
-================================================================================
-STEP 3: MULTI-OBJECT NEED
-================================================================================
+-- ================================================================================
+-- STEP 3: MULTI-OBJECT NEED
+-- ================================================================================
 
 -- Multi-object: Need to maintain consistency across tables
 
@@ -101,9 +101,9 @@ WHERE u.username = 'alice';
 
 -- KEY INSIGHT: Multi-object transactions ensure consistency!
 
-================================================================================
-STEP 4: FOREIGN KEY + TRANSACTION
-================================================================================
+-- ================================================================================
+-- STEP 4: FOREIGN KEY + TRANSACTION
+-- ================================================================================
 
 DROP TABLE IF EXISTS orders CASCADE;
 DROP TABLE IF EXISTS customers CASCADE;
@@ -164,9 +164,9 @@ JOIN products p ON oi.product_id = p.product_id;
 
 -- KEY: Transaction keeps all tables in sync!
 
-================================================================================
-STEP 5: DENORMALIZED DATA IN SYNC
-================================================================================
+-- ================================================================================
+-- STEP 5: DENORMALIZED DATA IN SYNC
+-- ================================================================================
 
 -- In denormalized designs, same data exists in multiple places
 
@@ -206,10 +206,10 @@ COMMIT;
 SELECT * FROM customers WHERE customer_id = 2;
 
 -- KEY: Transaction ensures denormalized data stays in sync!
-
-================================================================================
-STEP 6: ERROR HANDLING IN TRANSACTIONS
-================================================================================
+--
+-- ================================================================================
+-- STEP 6: ERROR HANDLING IN TRANSACTIONS
+-- ================================================================================
 
 -- Transactions can fail - need proper error handling
 
@@ -263,10 +263,10 @@ SELECT * FROM accounts;
 SELECT safe_transfer(1, 2, 10000.00);
 
 -- KEY: Proper error handling + transactions = robust code!
-
-================================================================================
-STEP 7: SAVEPOINTS FOR PARTIAL ROLLBACK
-================================================================================
+--
+-- ================================================================================
+-- STEP 7: SAVEPOINTS FOR PARTIAL ROLLBACK
+-- ================================================================================
 
 -- Savepoints allow partial rollback within a transaction
 
@@ -301,9 +301,9 @@ SELECT * FROM entries;
 
 -- KEY: Savepoints provide fine-grained control!
 
-================================================================================
-STEP 8: COMPARISON TABLE
-================================================================================
+-- ================================================================================
+-- STEP 8: COMPARISON TABLE
+-- ================================================================================
 
 DROP TABLE IF EXISTS operation_comparison CASCADE;
 
@@ -322,22 +322,22 @@ INSERT INTO operation_comparison VALUES
 
 SELECT * FROM operation_comparison;
 
-================================================================================
-SUMMARY
-================================================================================
+-- ================================================================================
+-- SUMMARY
+-- ================================================================================
 
-✅ SINGLE-OBJECT:
-  - Atomicity guaranteed by database (WAL)
-  - Fast, simple
-  - Good for simple CRUD
-
-✅ MULTI-OBJECT:
-  - All-or-nothing across tables
-  - Maintains referential integrity
-  - Required for complex business logic
-
-📌 DECISION GUIDE:
-  - Need consistency across tables? → Multi-object transaction
-  - Simple row updates? → Single-object (auto-atomic)
-
-EOF
+-- ✅ SINGLE-OBJECT:
+--   - Atomicity guaranteed by database (WAL)
+--   - Fast, simple
+--   - Good for simple CRUD
+--
+-- ✅ MULTI-OBJECT:
+--   - All-or-nothing across tables
+--   - Maintains referential integrity
+--   - Required for complex business logic
+--
+-- 📌 DECISION GUIDE:
+--   - Need consistency across tables? → Multi-object transaction
+--   - Simple row updates? → Single-object (auto-atomic)
+--
+-- EOF

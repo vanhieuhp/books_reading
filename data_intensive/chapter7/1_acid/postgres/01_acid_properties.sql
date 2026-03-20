@@ -1,49 +1,49 @@
-================================================================================
-  PostgreSQL ACID Properties - DDIA Chapter 7.1
-  Learn by doing: Understanding ACID Transactions
-
-  COVERS:
-  - Atomicity: All-or-nothing transactions
-  - Consistency: Invariants maintained
-  - Isolation: Concurrent transactions don't interfere
-  - Durability: Committed data survives crashes
-  - Write-Ahead Log (WAL) implementation
-  - Single-object vs multi-object operations
-================================================================================
-
-WHAT YOU'LL LEARN:
-  ✅ Atomicity: All-or-nothing transactions
-  ✅ Consistency: Invariants maintained
-  ✅ Isolation: Concurrent transactions don't interfere
-  ✅ Durability: Committed data survives crashes
-
-PREREQUISITES:
-  - PostgreSQL 10+
-  - psql or any PostgreSQL client
-
-================================================================================
-CONCEPT: ACID TRANSACTIONS
-================================================================================
-
-ACID = Atomicity, Consistency, Isolation, Durability
-
-From DDIA (pp. 228-234):
-  Transactions group several reads and writes into a logical unit.
-  Either the entire transaction succeeds (commit) or it fails (abort/rollback).
-
-================================================================================
-STEP 1: CONNECT TO POSTGRESQL
-================================================================================
-
-  psql -U postgres -d postgres
-
-================================================================================
-STEP 2: SETUP TEST DATABASE
-================================================================================
-
--- Create a test database for ACID demonstrations
-DROP DATABASE IF EXISTS acid_demo;
-CREATE DATABASE acid_demo;
+-- ================================================================================
+--   PostgreSQL ACID Properties - DDIA Chapter 7.1
+--   Learn by doing: Understanding ACID Transactions
+--
+--   COVERS:
+--   - Atomicity: All-or-nothing transactions
+--   - Consistency: Invariants maintained
+--   - Isolation: Concurrent transactions don't interfere
+--   - Durability: Committed data survives crashes
+--   - Write-Ahead Log (WAL) implementation
+--   - Single-object vs multi-object operations
+-- ================================================================================
+--
+-- WHAT YOU'LL LEARN:
+--   ✅ Atomicity: All-or-nothing transactions
+--   ✅ Consistency: Invariants maintained
+--   ✅ Isolation: Concurrent transactions don't interfere
+--   ✅ Durability: Committed data survives crashes
+--
+-- PREREQUISITES:
+--   - PostgreSQL 10+
+--   - psql or any PostgreSQL client
+--
+-- ================================================================================
+-- CONCEPT: ACID TRANSACTIONS
+-- ================================================================================
+--
+-- ACID = Atomicity, Consistency, Isolation, Durability
+--
+-- From DDIA (pp. 228-234):
+--   Transactions group several reads and writes into a logical unit.
+--   Either the entire transaction succeeds (commit) or it fails (abort/rollback).
+--
+-- ================================================================================
+-- STEP 1: CONNECT TO POSTGRESQL
+-- ================================================================================
+--
+--   psql -U postgres -d postgres
+--
+-- ================================================================================
+-- STEP 2: SETUP TEST DATABASE
+-- ================================================================================
+--
+-- -- Create a test database for ACID demonstrations
+-- DROP DATABASE IF EXISTS acid_demo;
+-- CREATE DATABASE acid_demo;
 
 \c acid_demo
 
@@ -75,9 +75,9 @@ INSERT INTO accounts (account_name, balance) VALUES
     ('Alice', 1000.00),
     ('Bob', 1000.00);
 
-================================================================================
-STEP 3: DEMONSTRATE ATOMICITY
-================================================================================
+-- ================================================================================
+-- STEP 3: DEMONSTRATE ATOMICITY
+-- ================================================================================
 
 -- Atomicity: All-or-nothing execution
 
@@ -109,9 +109,9 @@ SELECT account_name, balance FROM accounts ORDER BY account_name;
 
 -- KEY INSIGHT: Either ALL operations succeed or NONE do!
 
-================================================================================
-STEP 4: DEMONSTRATE CONSISTENCY
-================================================================================
+-- ================================================================================
+-- STEP 4: DEMONSTRATE CONSISTENCY
+-- ================================================================================
 
 -- Consistency: Invariants are maintained
 
@@ -162,9 +162,9 @@ INSERT INTO orders (customer_id, amount) VALUES (1, 99.99);
 -- KEY INSIGHT: Database enforces constraints (partial consistency)
 -- Full consistency is APPLICATION'S RESPONSIBILITY!
 
-================================================================================
-STEP 5: DEMONSTRATE ISOLATION
-================================================================================
+-- ================================================================================
+-- STEP 5: DEMONSTRATE ISOLATION
+-- ================================================================================
 
 -- Isolation: Concurrent transactions don't interfere
 
@@ -206,9 +206,9 @@ SELECT account_name, balance FROM accounts;
 -- KEY INSIGHT: PostgreSQL's default isolation prevents dirty reads!
 -- You can only see committed data from other transactions
 
-================================================================================
-STEP 6: DEMONSTRATE DURABILITY
-================================================================================
+-- ================================================================================
+-- STEP 6: DEMONSTRATE DURABILITY
+-- ================================================================================
 
 -- Durability: Committed data survives crashes
 
@@ -254,9 +254,9 @@ SHOW max_wal_size;
 -- 2. Syncing to disk on commit
 -- 3. Replaying WAL on crash recovery
 
-================================================================================
-STEP 7: DEMONSTRATE WRITE-AHEAD LOG (WAL)
-================================================================================
+-- ================================================================================
+-- STEP 7: DEMONSTRATE WRITE-AHEAD LOG (WAL)
+-- ================================================================================
 
 -- WAL is the foundation of atomicity and durability
 
@@ -288,9 +288,9 @@ SELECT * FROM wal_demo;
 -- 3. On crash, PostgreSQL replays WAL to recover committed transactions
 -- 4. Uncommitted transactions are rolled back
 
-================================================================================
-STEP 8: ERROR HANDLING AND RETRIES
-================================================================================
+-- ================================================================================
+-- STEP 8: ERROR HANDLING AND RETRIES
+-- ================================================================================
 
 -- When transactions fail, we need to handle errors properly
 
@@ -321,19 +321,19 @@ INSERT INTO table_b (value) VALUES ('initial_b');
 -- The application should retry
 
 -- Example of handling errors in application code:
--- BEGIN;
---     UPDATE table_a SET value = 'updated' WHERE id = 1;
---     -- If deadlock occurs, retry the transaction
--- COMMIT;
+BEGIN;
+    UPDATE table_a SET value = 'updated' WHERE id = 1;
+    -- If deadlock occurs, retry the transaction
+COMMIT;
 
 -- KEY INSIGHT:
 -- - Transient errors (deadlock, timeout): Retry
 -- - Permanent errors (constraint violation): Don't retry
 -- - Use exponential backoff to avoid overwhelming the system
 
-================================================================================
-STEP 9: COMPARE ACID IMPLEMENTATIONS
-================================================================================
+-- ================================================================================
+-- STEP 9: COMPARE ACID IMPLEMENTATIONS
+-- ================================================================================
 
 -- Different databases implement ACID differently
 
@@ -346,7 +346,7 @@ STEP 9: COMPARE ACID IMPLEMENTATIONS
 -- - Durability: Synchronous commit, replication
 
 -- Let's check PostgreSQL's settings
-SELECT name, setting, unit, description
+SELECT name, setting, unit, short_desc
 FROM pg_settings
 WHERE name IN ('wal_level', 'synchronous_commit', 'max_wal_senders');
 
@@ -367,9 +367,9 @@ INSERT INTO acid_implementation (property, description, postgres_implementation)
 
 SELECT * FROM acid_implementation;
 
-================================================================================
-STEP 10: PRACTICAL EXAMPLE - MONEY TRANSFER
-================================================================================
+-- ================================================================================
+-- STEP 10: PRACTICAL EXAMPLE - MONEY TRANSFER
+-- ================================================================================
 
 -- Let's create a robust money transfer function
 
@@ -434,45 +434,45 @@ SELECT * FROM accounts;
 -- KEY INSIGHT: The function uses FOR UPDATE to lock rows
 -- This prevents race conditions during the transfer
 
-================================================================================
-SUMMARY: ACID PROPERTIES
-================================================================================
+-- ================================================================================
+-- SUMMARY: ACID PROPERTIES
+-- ================================================================================
 
-✅ ATOMICITY:
-  - All writes succeed or all fail
-  - Implemented via Write-Ahead Log (WAL)
-  - Use BEGIN/COMMIT/ROLLBACK
+-- ✅ ATOMICITY:
+--   - All writes succeed or all fail
+--   - Implemented via Write-Ahead Log (WAL)
+--   - Use BEGIN/COMMIT/ROLLBACK
+--
+-- ✅ CONSISTENCY:
+--   - Invariants are maintained
+--   - Database enforces constraints
+--   - Application enforces business logic
+--
+-- ✅ ISOLATION:
+--   - Concurrent transactions don't interfere
+--   - PostgreSQL uses MVCC
+--   - Default: Read Committed
+--
+-- ✅ DURABILITY:
+--   - Committed data survives crashes
+--   - WAL + fsync ensures durability
+--   - Replication for extra safety
+--
+-- 📌 KEY TRADE-OFFS:
+--   - Full ACID = More overhead (logging, locking)
+--   - Many systems relax for performance
+--   - Choose based on your workload
+--
+-- ================================================================================
+-- NEXT STEPS:
+-- ================================================================================
+--
+-- 1. Try Chapter 7.2: Multi-Object Transactions
+--    - See how to maintain consistency across multiple tables
+--
+-- 2. Try Chapter 7.3: Weak Isolation Levels
+--    - Understand Read Committed, Snapshot Isolation
+--
+-- 3. Read DDIA pp. 228-252 for more theory
 
-✅ CONSISTENCY:
-  - Invariants are maintained
-  - Database enforces constraints
-  - Application enforces business logic
-
-✅ ISOLATION:
-  - Concurrent transactions don't interfere
-  - PostgreSQL uses MVCC
-  - Default: Read Committed
-
-✅ DURABILITY:
-  - Committed data survives crashes
-  - WAL + fsync ensures durability
-  - Replication for extra safety
-
-📌 KEY TRADE-OFFS:
-  - Full ACID = More overhead (logging, locking)
-  - Many systems relax for performance
-  - Choose based on your workload
-
-================================================================================
-NEXT STEPS:
-================================================================================
-
-1. Try Chapter 7.2: Multi-Object Transactions
-   - See how to maintain consistency across multiple tables
-
-2. Try Chapter 7.3: Weak Isolation Levels
-   - Understand Read Committed, Snapshot Isolation
-
-3. Read DDIA pp. 228-252 for more theory
-
-EOF
+-- EOF

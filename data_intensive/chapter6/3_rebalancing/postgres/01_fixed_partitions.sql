@@ -1,47 +1,47 @@
-================================================================================
-  PostgreSQL Fixed Partition Rebalancing - DDIA Chapter 6.3
-  Learn by doing: Strategy 1 - Fixed Number of Partitions
-================================================================================
+-- ================================================================================
+--   PostgreSQL Fixed Partition Rebalancing - DDIA Chapter 6.3
+--   Learn by doing: Strategy 1 - Fixed Number of Partitions
+-- ================================================================================
 
-WHAT YOU'LL LEARN:
-  ✅ How fixed partition count strategy works
-  ✅ Why partition boundaries never change
-  ✅ How rebalancing works (partition reassignment)
-  ✅ The trade-off: must choose partition count upfront
+-- WHAT YOU'LL LEARN:
+--   ✅ How fixed partition count strategy works
+--   ✅ Why partition boundaries never change
+--   ✅ How rebalancing works (partition reassignment)
+--   ✅ The trade-off: must choose partition count upfront
 
-PREREQUISITES:
-  - PostgreSQL 10+ (native partitioning support)
-  - psql or any PostgreSQL client
+-- PREREQUISITES:
+--   - PostgreSQL 10+ (native partitioning support)
+--   - psql or any PostgreSQL client
 
-================================================================================
-CONCEPT: FIXED PARTITION COUNT STRATEGY
-================================================================================
+-- ================================================================================
+-- CONCEPT: FIXED PARTITION COUNT STRATEGY
+-- ================================================================================
 
-From DDIA (pp. 203-207):
-  "Fix the number of partitions by configuring the database before adding data.
-   The partition count is set at database creation time and does not change."
+-- From DDIA (pp. 203-207):
+--   "Fix the number of partitions by configuring the database before adding data.
+--    The partition count is set at database creation time and does not change."
 
-Key Points:
-  - Partition count is FIXED forever
-  - Only partition-to-node ASSIGNMENTS change
-  - Rebalancing = bulk file moves between nodes
-  - Trade-off: must estimate partition count upfront
+-- Key Points:
+--   - Partition count is FIXED forever
+--   - Only partition-to-node ASSIGNMENTS change
+--   - Rebalancing = bulk file moves between nodes
+--   - Trade-off: must estimate partition count upfront
 
-Used by: Riak, Elasticsearch, Couchbase
+-- Used by: Riak, Elasticsearch, Couchbase
 
-================================================================================
-STEP 1: CONNECT TO POSTGRESQL
-================================================================================
+-- ================================================================================
+-- STEP 1: CONNECT TO POSTGRESQL
+-- ================================================================================
 
-  psql -U postgres -d postgres
-
-Or:
-
-  psql -U postgres -d mydb
-
-================================================================================
-STEP 2: CREATE FIXED PARTITIONS (THE "FIXED" PART)
-================================================================================
+--   psql -U postgres -d postgres
+--
+-- Or:
+--
+--   psql -U postgres -d mydb
+--
+-- ================================================================================
+-- STEP 2: CREATE FIXED PARTITIONS (THE "FIXED" PART)
+-- ================================================================================
 
 -- Drop existing tables
 DROP TABLE IF EXISTS users CASCADE;
@@ -79,10 +79,10 @@ CREATE TABLE users_p7 PARTITION OF users FOR VALUES WITH (MODULUS 8, REMAINDER 7
 -- Create indexes
 CREATE INDEX idx_users_username ON users (username);
 CREATE INDEX idx_users_email ON users (email);
-
-================================================================================
-STEP 3: SIMULATE NODE ASSIGNMENTS (INITIAL STATE)
-================================================================================
+--
+-- ================================================================================
+-- STEP 3: SIMULATE NODE ASSIGNMENTS (INITIAL STATE)
+-- ================================================================================
 
 -- In fixed partition strategy, partitions are assigned to nodes
 -- These assignments CHANGE during rebalancing, but partitions stay the same
@@ -101,9 +101,9 @@ INSERT INTO user_nodes (partition_id, node_id) VALUES
 -- View current assignment
 SELECT * FROM user_nodes ORDER BY partition_id;
 
-================================================================================
-STEP 4: INSERT DATA AND OBSERVE PARTITION DISTRIBUTION
-================================================================================
+-- ================================================================================
+-- STEP 4: INSERT DATA AND OBSERVE PARTITION DISTRIBUTION
+-- ================================================================================
 
 -- Insert sample users
 INSERT INTO users (username, email) VALUES
@@ -136,9 +136,9 @@ ORDER BY relname;
 -- The key insight: partition boundaries NEVER change!
 -- Only the node assignment (user_nodes) changes during rebalancing
 
-================================================================================
-STEP 5: DEMONSTRATE REBALANCING (PARTITION REASSIGNMENT)
-================================================================================
+-- ================================================================================
+-- STEP 5: DEMONSTRATE REBALANCING (PARTITION REASSIGNMENT)
+-- ================================================================================
 
 -- Simulating what happens when we add a new node (Node 4)
 
